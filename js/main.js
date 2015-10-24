@@ -43,10 +43,12 @@ var cars = new Cars([
 		registrationNumber: "XUV456",
 		colour: "Gray"
 	})
-]);
+	]);
 
 var matchedCar = cars.where({registrationNumber: "XLI887"});
+
 console.log("XLI887 Car", matchedCar);
+
 cars.remove(matchedCar);
 
 var blueCars = cars.filter(function(car){
@@ -59,11 +61,4 @@ console.log("Collection of Cars: ", cars.toJSON());
 
 cars.each(function(car){
 	console.log(car);
-})
-
-
-// Find all the Blue colours and log them in the console.
-// Find the car with the registration number XLI887 and log it in the console.
-// Remove this car from the collection.
-// Convert the collection to a JSON object and log it in the console.
-// Iterate the collection and log each car in the console.
+});
