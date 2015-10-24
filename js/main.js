@@ -1,11 +1,12 @@
-var Vehicle = Backbone.Model.extend({
+var Vehicle = Backbone.Model.extend({ // Vehicle Model
 
 	idAttribute: "registrationNumber",
 
 	urlRoot: "/api/vehicles",
 
 	defaults: {
-		registrationNumber: 0
+		registrationNumber: "00000",
+		colour: "Blue"
 	},
 
 	validate: function(attrs){
@@ -20,18 +21,31 @@ var Vehicle = Backbone.Model.extend({
 });
 
 
-var Car = Vehicle.extend({
-	start: function(){
-		console.log("Car with registration number " + this.get("registrationNumber") + " and color " + this.get("color") + " started.");
-	}
-});
+var Car = Vehicle.extend(); // extension of Vehicle model
 
-var Cars = Backbone.Collection.extend({
+var Cars = Backbone.Collection.extend({ // collection of Car Models
 	model: Car
 });
 
-var CarView = Backbone.View.extend({
+var CarView = Backbone.View.extend({ // single Car View, renders one Car as a LI element
 	tagName: "li",
+
+	className: "vehicle",
+
+	attributes: function() {
+		return {
+			"data-color": this.model.get("colour"),
+			"data-reg-num": this.model.get("registrationNumber")
+		}
+	},
+
+	events: {
+		"click button.remove": "removeCar"
+	},
+
+	removeCar: function(){
+		cars.remove(this.model);
+	},
 
 	render: function(){
 		var template = _.template($("#carTemplate").html());
@@ -42,14 +56,10 @@ var CarView = Backbone.View.extend({
 	}
 });
 
-var CarsView = Backbone.View.extend({
-	events: {
-		"click": "onClick"
-	},
-
+var CarsView = Backbone.View.extend({ // iterates over the collection of Cars and wraps each model with a CarView and appends to DOM
 	initialize: function(){
 		this.model.on("add", this.onCarAdd, this);
-		this.model.on("remove", this.onRemoveCar, this);
+		this.model.on("remove", this.onRemove, this);
 	},
 
 	onCarAdd: function(car){
@@ -59,9 +69,11 @@ var CarsView = Backbone.View.extend({
 		this.$el.append(carView.render().$el);
 	},
 
-	onRemoveCar: function(car){
-		console.log("removed");
+	onRemove: function(car){
+		console.log('removed');
+		this.$("li[data-reg-num=" + car.get("registrationNumber") + "]").remove();
 	},
+
 	render: function(){
 		var self = this;
 		this.model.each(function(car){
@@ -72,26 +84,23 @@ var CarsView = Backbone.View.extend({
 	}
 });
 
-var cars = new Cars([
+var cars = new Cars([ // instantiation of Collection
 	new Car({
+		id : "1",
 		registrationNumber: "XLI887",
 		colour: "Blue"
 	}),
 	new Car({
+		id : "2",
 		registrationNumber: "ZNP123",
 		colour: "Blue"
 	}),
 	new Car({
+		id : "3",
 		registrationNumber: "XUV456",
 		colour: "Gray"
 	})
 	]);
 
-var carsView = new CarsView({el: "#cars", model: cars});
+var carsView = new CarsView({el: "#cars", model: cars}); // the View
 carsView.render();
-
-// Create the required Backbone views to display a list of Vehicles.
-// Each Vehicle should be displayed as an LI with the class vehicle. Inside the LI display
-// the registration number of the vehicle followed by a button called Delete.
-// Each list item should have the HTML5 data attribute data-color.
-// When the delete button is clicked, remove the corresponding LI from the DOM.
