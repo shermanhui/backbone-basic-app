@@ -26,25 +26,42 @@ var Car = Vehicle.extend({
 	}
 });
 
+var Cars = Backbone.Collection.extend({
+	model: Car
+});
+
 var CarView = Backbone.View.extend({
 	tagName: "li",
 
-	events: {
-		"click": "onClick"
-	},
-
-	onClick: function(){
-		console.log("removed");
-	},
-
 	render: function(){
-		this.$el.html(this.model.get("registrationNumber") + " <button>Remove</button>");
+		var template = _.template($("#carTemplate").html());
+		var html = template(this.model.toJSON());
+		this.$el.html(html);
 
 		return this;
 	}
 });
 
 var CarsView = Backbone.View.extend({
+	events: {
+		"click": "onClick"
+	},
+
+	initialize: function(){
+		this.model.on("add", this.onCarAdd, this);
+		this.model.on("remove", this.onRemoveCar, this);
+	},
+
+	onCarAdd: function(car){
+		console.log("Car Added");
+		var carView = new CarView({model: car});
+
+		this.$el.append(carView.render().$el);
+	},
+
+	onRemoveCar: function(car){
+		console.log("removed");
+	},
 	render: function(){
 		var self = this;
 		this.model.each(function(car){
@@ -53,11 +70,6 @@ var CarsView = Backbone.View.extend({
 			self.$el.append(carView.render().$el)
 		})
 	}
-})
-
-
-var Cars = Backbone.Collection.extend({
-	model: Car
 });
 
 var cars = new Cars([
