@@ -21,16 +21,29 @@ var Vehicle = Backbone.Model.extend({
 
 var Car = Vehicle.extend({
 	start: function(){
-		//Vehicle.prototype.start.apply(this);
-
-		console.log("Car started")
+		console.log("Car with registration number " + this.get("registrationNumber") + " and color " + this.get("color") + " started.")
 	}
 });
 
 var car = new Car({
 	registrationNumber: "XLI887",
-	color: "blue"
+	color: "Blue"
 });
+
+car.start();
+
+car.unset("registrationNumber");
+
+if (!car.isValid()){
+	console.log(car.validationError);
+}
+
+if (car.isValid()){
+	console.log("Car is Valid!")
+} else {
+	console.log(car.validationError);
+}
+
 
 // car.fetch({
 // 	success: function(){
